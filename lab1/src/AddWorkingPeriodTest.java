@@ -9,7 +9,9 @@ public class AddWorkingPeriodTest {
 	@Test public void testStartZero() {
 		int size = 10;
 		schedule = new WorkSchedule(size);
+		schedule.setRequiredNumber(1, 0, 9);
 		WorkSchedule oldSchedule = new WorkSchedule(size);
+		oldSchedule.setRequiredNumber(1, 0, 9);
 		
 		boolean result = schedule.addWorkingPeriod("Bob", -1, 5);
 		assertFalse(result);
@@ -19,7 +21,9 @@ public class AddWorkingPeriodTest {
 	@Test public void testEndOver() {
 		int size = 10;
 		schedule = new WorkSchedule(size);
+		schedule.setRequiredNumber(1, 0, 9);
 		WorkSchedule oldSchedule = new WorkSchedule(size);
+		oldSchedule.setRequiredNumber(1, 0, 9);
 		
 		boolean result = schedule.addWorkingPeriod("Bob", 2, 10);
 		assertFalse(result);
@@ -30,7 +34,9 @@ public class AddWorkingPeriodTest {
 	@Test public void testStartOverEnd() {
 		int size = 10;
 		schedule = new WorkSchedule(size);
+		schedule.setRequiredNumber(1, 0, 9);
 		WorkSchedule oldSchedule = new WorkSchedule(size);
+		oldSchedule.setRequiredNumber(1, 0, 9);
 		
 		boolean result = schedule.addWorkingPeriod("Bob", 6, 4);
 		assertFalse(result);
