@@ -6,44 +6,48 @@ import static org.junit.Assert.*;
 public class AddWorkingPeriodTest {
 	private WorkSchedule schedule;
 
+  // Tests when starttime == 0
 	@Test public void testStartZero() {
 		int size = 10;
 		schedule = new WorkSchedule(size);
 		schedule.setRequiredNumber(1, 0, 9);
 		WorkSchedule oldSchedule = new WorkSchedule(size);
 		oldSchedule.setRequiredNumber(1, 0, 9);
-		
+
 		boolean result = schedule.addWorkingPeriod("Bob", -1, 5);
 		assertFalse(result);
 		compareSchedules(schedule, oldSchedule, size);
 	}
-	
+
+  // Tests when endtime > size
 	@Test public void testEndOver() {
 		int size = 10;
 		schedule = new WorkSchedule(size);
 		schedule.setRequiredNumber(1, 0, 9);
 		WorkSchedule oldSchedule = new WorkSchedule(size);
 		oldSchedule.setRequiredNumber(1, 0, 9);
-		
+
 		boolean result = schedule.addWorkingPeriod("Bob", 2, 10);
 		assertFalse(result);
 		compareSchedules(schedule, oldSchedule, size);
 	}
-	
-	/* Failing
+
+	// FAILS. Tests when starttime > endtime
 	@Test public void testStartOverEnd() {
 		int size = 10;
 		schedule = new WorkSchedule(size);
 		schedule.setRequiredNumber(1, 0, 9);
 		WorkSchedule oldSchedule = new WorkSchedule(size);
 		oldSchedule.setRequiredNumber(1, 0, 9);
-		
+
 		boolean result = schedule.addWorkingPeriod("Bob", 6, 4);
+    /* Returns true
 		assertFalse(result);
+    */
 		compareSchedules(schedule, oldSchedule, size);
 	}
-	*/
-	
+
+  // Tests adding more employees than requiredNumber
 	@Test public void testRequiredNumber() {
 		int size = 10;
 		schedule = new WorkSchedule(size);
@@ -52,12 +56,13 @@ public class AddWorkingPeriodTest {
 		schedule.addWorkingPeriod("Alice", 4, 4);
 		oldSchedule.setRequiredNumber(1, 3, 6);
 		oldSchedule.addWorkingPeriod("Alice", 4, 4);
-		
+
 		boolean result = schedule.addWorkingPeriod("Bob", 3, 6);
 		assertFalse(result);
 		compareSchedules(schedule, oldSchedule, size);
 	}
-	
+
+  // Tests adding an employee more than once
 	@Test public void testEmployeeAlreadyExists() {
 		int size = 10;
 		schedule = new WorkSchedule(size);
@@ -66,12 +71,13 @@ public class AddWorkingPeriodTest {
 		schedule.addWorkingPeriod("Bob", 4, 4);
 		oldSchedule.setRequiredNumber(2, 3, 6);
 		oldSchedule.addWorkingPeriod("Bob", 4, 4);
-		
+
 		boolean result = schedule.addWorkingPeriod("Bob", 3, 6);
 		assertFalse(result);
 		compareSchedules(schedule, oldSchedule, size);
 	}
-	
+
+  // Tests espected success
 	@Test public void testSuccess() {
 		int size = 10;
 		schedule = new WorkSchedule(size);
@@ -80,10 +86,10 @@ public class AddWorkingPeriodTest {
 		schedule.addWorkingPeriod("Bob", 4, 4);
 		oldSchedule.setRequiredNumber(2, 3, 6);
 		oldSchedule.addWorkingPeriod("Bob", 4, 4);
-		
+
 		boolean result = schedule.addWorkingPeriod("Alice", 3, 6);
 		assertTrue(result);
-		
+
 		// Initiate magic
 		for(int i = 0; i < size; i++) {
 			WorkSchedule.Hour h1 = schedule.readSchedule(i);
@@ -96,7 +102,7 @@ public class AddWorkingPeriodTest {
 				for(int j = 0; j < h2.workingEmployees.length; j++) {
 					assertTrue(Arrays.asList(h1.workingEmployees).contains(h2.workingEmployees[j]));
 				}
-				
+
 			} else {
 				// Should be unchanged
 				assertTrue(h1.requiredNumber == h2.requiredNumber);
@@ -104,7 +110,8 @@ public class AddWorkingPeriodTest {
 			}
 		}
 	}
-	
+
+  // Compares two schedules for equality
 	private void compareSchedules(WorkSchedule schedule1, WorkSchedule schedule2, int size) {
 		for(int i = 0; i < size; i++) {
 			WorkSchedule.Hour h1 = schedule1.readSchedule(i);

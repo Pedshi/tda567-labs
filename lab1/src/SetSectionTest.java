@@ -5,12 +5,13 @@ import static org.junit.Assert.*;
 public class SetSectionTest {
 	private Set set;
 	private Set removeSet;
-	
+
 	@Before public void setUp() {
 		set = new Set();
 		removeSet = new Set();
 	}
-	
+
+  // Statement and branch coverage
 	@Test public void testSection() {
 		set.insert(1);
 		removeSet.insert(1);
@@ -26,7 +27,7 @@ public class SetSectionTest {
 		assertTrue(set.member(1));
 		assertTrue(set.toArray().length == 1);
 	}
-	
+
 	@Test public void testNoRemove2() {
 		set.insert(2);
 		removeSet.insert(1);
@@ -34,5 +35,5 @@ public class SetSectionTest {
 		assertTrue(set.member(2));
 		assertTrue(set.toArray().length == 1);
 	}
-	
+
 }

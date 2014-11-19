@@ -5,6 +5,7 @@ import org.junit.*;
 import static org.junit.Assert.*;
 
 public class NextIncompleteTest {
+  // Tests expected success
 	@Test public void testSuccess(){
 		WorkSchedule schedule = new WorkSchedule(10);
 		WorkSchedule oldSchedule = new WorkSchedule(10);
@@ -14,13 +15,14 @@ public class NextIncompleteTest {
 		oldSchedule.setRequiredNumber(1, 4, 5);
 		oldSchedule.setRequiredNumber(2, 6, 6);
 		oldSchedule.addWorkingPeriod("Bob", 4, 6);
-		
+
 		int time = schedule.nextIncomplete(3);
 		assertTrue(time == 6);
-		
+
 		compareSchedules(schedule, oldSchedule, 10);
 	}
 
+  // Tests searching when there are no open spots
 	@Test public void testFail(){
 		WorkSchedule schedule = new WorkSchedule(10);
 		WorkSchedule oldSchedule = new WorkSchedule(10);
@@ -28,13 +30,14 @@ public class NextIncompleteTest {
 		schedule.addWorkingPeriod("Bob", 4, 6);
 		oldSchedule.setRequiredNumber(1, 4, 6);
 		oldSchedule.addWorkingPeriod("Bob", 4, 6);
-		
+
 		int time = schedule.nextIncomplete(3);
 		assertTrue(time == -1);
-		
+
 		compareSchedules(schedule, oldSchedule, 10);
 	}
-	
+
+  // Compares two schedules for equality
 	private void compareSchedules(WorkSchedule schedule1, WorkSchedule schedule2, int size) {
 		for(int i = 0; i < size; i++) {
 			WorkSchedule.Hour h1 = schedule1.readSchedule(i);
