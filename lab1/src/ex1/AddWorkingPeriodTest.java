@@ -41,9 +41,7 @@ public class AddWorkingPeriodTest {
 		oldSchedule.setRequiredNumber(1, 0, 9);
 
 		boolean result = schedule.addWorkingPeriod("Bob", 6, 4);
-    /* Returns true
 		assertFalse(result);
-    */
 		compareSchedules(schedule, oldSchedule, size);
 	}
 
@@ -77,7 +75,7 @@ public class AddWorkingPeriodTest {
 		compareSchedules(schedule, oldSchedule, size);
 	}
 
-  // Tests espected success
+  // Tests expected success
 	@Test public void testSuccess() {
 		int size = 10;
 		schedule = new WorkSchedule(size);

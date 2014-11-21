@@ -5,9 +5,7 @@ import static org.junit.Assert.*;
 public class SetRequiredNumberTest {
 	private WorkSchedule schedule;
 
-	/**
-	 * Possible to insert hours in the whole available range (0..size-1).
-	 */
+	// Possible to insert hours in the whole available range (0..size-1).
 	@Test public void testCorrectInserted1() {
 		int size = 10;
 		schedule = new WorkSchedule(size);
@@ -19,9 +17,7 @@ public class SetRequiredNumberTest {
 		checkRequiredNumber(nemployee, starttime, endtime);
 	}
 
-	/**
-	 * Possible to insert a single hour.
-	 */
+	// Possible to insert a single hour.
 	@Test public void testCorrectInserted2() {
 		int size = 10;
 		schedule = new WorkSchedule(size);
@@ -33,9 +29,7 @@ public class SetRequiredNumberTest {
 		checkRequiredNumber(nemployee, starttime, endtime);
 	}
 	
-	/**
-	 * Should not change any hours outside the specified range.
-	 */
+	// Should not change any hours outside the specified range.
 	@Test public void testUnchanged1() {
 		int size = 10;
 		schedule = new WorkSchedule(size);
@@ -48,9 +42,7 @@ public class SetRequiredNumberTest {
 		checkRequiredNumber(0, endtime+1, size-1);
 	}
 
-	/**
-	 * Should not change any hours outside the specified range (when hours are non-zero).
-	 */
+	// Should not change any hours outside the specified range (when hours are non-zero).
 	@Test public void testUnchanged2() {
 		int size = 10;
 		schedule = new WorkSchedule(size);
@@ -64,9 +56,7 @@ public class SetRequiredNumberTest {
 		checkRequiredNumber(nemployee, endtime+1, size-1);
 	}
 	
-	/**
-	 * Checks value of required employee amount for hours in range starttime...endtime.
-	 */
+	// Checks value of required employee amount for hours in range starttime...endtime.
 	public void checkRequiredNumber(int nemployee, int starttime, int endtime) {
 		for(int i = starttime; i <= endtime; i++) {
 			WorkSchedule.Hour h = schedule.readSchedule(i);

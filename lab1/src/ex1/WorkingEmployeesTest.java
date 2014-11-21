@@ -16,10 +16,9 @@ public class WorkingEmployeesTest {
 		oldSchedule.setRequiredNumber(1, 4, 6);
 		oldSchedule.addWorkingPeriod("Bob", 4, 6);
 
-    /* Still returns all entries within the interval
-     * even when starttime > endtime
+    // Still returns all entries within the interval
+    // even when starttime > endtime
 		assertTrue(schedule.workingEmployees(6, 4).length == 0);
-    */
 
 		compareSchedules(schedule, oldSchedule, 10);
 
