@@ -15,19 +15,34 @@ This is a class to simulate the enrollment station. It contains a list of all
 the issued tokens (to avoid duplicates) and a method to issue a new token.
 
 The issued tokens list is implemented as a map to be able to quickly look up a
-user and to easily see whether that user is already registered.
+user to easily see whether that user is already registered.
+
+The registerUser method requires that the user is not already registered and
+ensures that the user added to the map has the returned token (for obvious
+reasons).
 
 ---IDStation---
 
-Simulates the ID station. Each station is connected to a single door and stores
-the required clearance level and can authenticate a token.
+Simulates the ID station. Each station is connected to a single door, stores
+the required clearance level, and can authenticate a token.
 
-The authentication method just checks if a users fingerprint matches the token
+The authentication method just checks if a user's fingerprint matches the token
 and if they have sufficient clearance and passes that back to the main system.
+Here we make sure that the returned boolean is valid if and only if the finger-
+print and clearance level match.
 
 ---SuperSystem---
 
-A system for that handles communications between the different parts of the
-system. It also handles opening door or raising an alarm depeneding on whether
-the ID station validated a token.
+A system that handles communications between the different parts of the system.
+It also handles opening the door or raising an alarm depending on whether the
+ID station validated the token.
+
+For the openDoor and raiseAlarm methods, we chose to use simple print
+statements. To be able to reason (in the specification) about whether the door
+actually opened and/or the alarm was raised, we have two booleans that are
+checked in the authenticate method (among others).
+
+
+Note: Due to lack of time (the online checker was down most of the time), we
+did not refactor the token validations into dafny predicates.
 
