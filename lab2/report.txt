@@ -1,0 +1,33 @@
+---Token---
+
+This class contains all neccessary data for a token. The class variables
+contains the owners fingerprint, their clearance level and whether the token is
+valid or not. It is also able to invalidate itself.
+
+We chose to store whether a token is valid or not inside the token itself since
+in this simulated system we cannot really guarantee that a token cannot be
+reused elsewhere (by letting the token reader eat the card or similar in real
+systems).
+
+---EnrollmentStation---
+
+This is a class to simulate the enrollment station. It contains a list of all
+the issued tokens (to avoid duplicates) and a method to issue a new token.
+
+The issued tokens list is implemented as a map to be able to quickly look up a
+user and to easily see whether that user is already registered.
+
+---IDStation---
+
+Simulates the ID station. Each station is connected to a single door and stores
+the required clearance level and can authenticate a token.
+
+The authentication method just checks if a users fingerprint matches the token
+and if they have sufficient clearance and passes that back to the main system.
+
+---SuperSystem---
+
+A system for that handles communications between the different parts of the
+system. It also handles opening door or raising an alarm depeneding on whether
+the ID station validated a token.
+

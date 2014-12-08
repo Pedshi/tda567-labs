@@ -1,22 +1,21 @@
 datatype ClearanceLevel = Low | Medium | High;
-//datatype Token = Token(id : int, clearance : ClearanceLevel);
 
 class Token {
   var id : int;
   var clearanceLevel : ClearanceLevel;
   var valid : bool;
-  
+
   constructor (i : int, level : ClearanceLevel)
   modifies this;
   ensures id == i;
   ensures clearanceLevel == level;
-  ensures valid; 
+  ensures valid;
   {
     id := i;
     clearanceLevel := level;
     valid := true;
   }
-  
+
   method invalidate()
   modifies `valid;
   requires valid;
@@ -28,14 +27,14 @@ class Token {
 
 class EnrollmentStation {
   var users : map<int, Token>;
-  
+
   constructor ()
   modifies this;
   ensures |users| == 0;
   {
     users := map[];
   }
-  
+
   method registerUser(id : int, clearance : ClearanceLevel) returns (token : Token)
   modifies `users;
   requires id !in users;
@@ -44,7 +43,7 @@ class EnrollmentStation {
   ensures token != null;
   ensures token.id == id;
   {
-    var tok := new Token(id, clearance); 
+    var tok := new Token(id, clearance);
     users := users[id := tok];
     return (tok);
   }
@@ -52,18 +51,18 @@ class EnrollmentStation {
 
 class IDStation {
   var doorClearance : ClearanceLevel;
-  
+
   constructor (level : ClearanceLevel)
   modifies this;
   ensures doorClearance == level;
   {
     doorClearance := level;
   }
-  
+
   method authenticateToken(fingerprint : int, token : Token) returns (valid : bool)
   requires token != null;
   requires token.valid;
-  ensures ((token.id == fingerprint) && (token.clearanceLevel == doorClearance)) <==> valid;  
+  ensures ((token.id == fingerprint) && (token.clearanceLevel == doorClearance)) <==> valid;
   {
     if (token.id == fingerprint){
       return (token.clearanceLevel == doorClearance);
@@ -78,7 +77,7 @@ class SuperSystem {
   var idstn : IDStation;
   var doorOpen : bool;
   var alarmSounding : bool;
-  
+
   constructor (clearance : ClearanceLevel)
   modifies this;
   ensures idstn != null;
@@ -91,7 +90,7 @@ class SuperSystem {
     doorOpen := false;
     alarmSounding := false;
   }
-  
+
   method authenticate(fingerprint : int, token : Token)
   modifies token;
   modifies `doorOpen;
@@ -111,7 +110,7 @@ class SuperSystem {
       raiseAlarm();
     }
   }
-  
+
   method openDoor()
   modifies `doorOpen;
   ensures doorOpen;
@@ -119,15 +118,12 @@ class SuperSystem {
     print("Door open");
     doorOpen := true;
   }
-  
+
   method raiseAlarm()
   modifies `alarmSounding;
   ensures alarmSounding;
   {
     print("BEEP BEEP BEEP");
     alarmSounding := true;
-  }
-  
-  method Main(){
   }
 }
