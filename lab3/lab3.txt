@@ -79,9 +79,87 @@
   x != y ==> (x <= y ==> y > x)
 
   Since x can no longer be equal to y this holds as well.
-    
+
+-- 3 --
+
+  --a--
+  See enclosed file.
+
+  --b--
+
+  S1 = res := 0; if (n0 >= 0) then (n,m := n0, m0) else (n,m := -n0, -m0;)
+  S  = res := res + m; n := n - 1
+
+  Invariant I = ?
+  Variant   V = ?
+
+  wp(S1, while (0 < n) S)
+
+  We now need five caes for proving the entire while-loop.
+
+  1. I needs to hold when entering the loop:
+
+    wp(S1, I) =
+    wp(res := 0; if (n0 >= 0) then (n,m := n0, m0) else (n,m := -n0, -m0;), I)
+
+    Sequential:
+    wp(res := 0, wp(if (n0 >= 0) then (n,m := n0, m0) else (n,m := -n0, -m0;), I))
+
+    Conditional:
+    wp(res := 0,
+      (n0 >= 0) ==> wp((n,m :=  n0,  m0) , I)) &&
+      (n0 <  0) ==> wp((n,m := -n0, -m0;), I))
+
+    Assignment:
 
 
 
+
+  2. Invariant holds each iteration:
+
+    (I && 0 < n) ==> wp(S, I) =
+    (I && 0 < n) ==> wp(res := res + m; n := n - 1, I)
+
+    Sequential:
+    (I && 0 < n) ==> wp(res := res + m, wp(n := n - 1, I))
+
+    Assignment:
+
+
+
+  3. Postcondition holds after loop:
+
+    (I && 0 >= n) ==> (res == n * m)
+
+
+
+  4. Variant is bounded until loop termination:
+
+    (I && 0 < n) ==> n > 0
+
+    Trivially true
+
+
+  5. Variant decreases each iteration:
+
+    (I && 0 < n) ==> wp(V1 := n; S, n < V1) =
+    (I && 0 < n) ==> wp(V1 := n; res := res + m; n := n - 1, n < V1)
+
+    Sequential:
+    (I && 0 < n) ==> wp(V1 := n, wp(res := res + m; n := n - 1, n < V1))
+
+    Sequential:
+    (I && 0 < n) ==> wp(V1 := n, wp(res := res + m, wp(n := n - 1, n < V1)))
+
+    Assignment:
+    (I && 0 < n) ==> wp(V1 := n, wp(res := res + m, n - 1 < V1))
+
+    Assignment:
+    (I && 0 < n) ==> wp(V1 := n, n - 1 < V1)
+
+    Assignment:
+    (I && 0 < n) ==> n - 1 < n
+
+    Conclusion is trivially true so the implication holds
 
 
