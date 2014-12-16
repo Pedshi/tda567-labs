@@ -1,0 +1,87 @@
+-- 1 --
+
+  S = if (x < 0) then (y := -x) else (y := x)
+
+  wp(S, 0 <= y && 0 <= x ==> y == x && x < 0 ==> y == -x)
+
+  Conditional
+  x < 0 ==> wp(y := -x, 0 <= y && 0 <= x ==> y == x && x < 0 ==> y == -x) &&
+  x >= 0 ==> wp(y := x, 0 <= y && 0 <= x ==> y == x && x < 0 ==> y == -x)
+
+  case 1:
+    x < 0 ==> wp(y := -x, 0 <= y && 0 <= x ==> y == x && x < 0 ==> y == -x)
+
+    Assignment
+    x < 0 ==> (0 <= -x && 0 <= x ==> -x == x && x < 0 ==> -x == -x)
+
+    x < 0 ==> 0 <= -x
+      Trivially true
+    x < 0 ==> (0 <= x ==> -x == x)
+      Second premise becomes false following from the first
+    x < 0 ==> (x < 0 ==> -x == -x)
+      Conclusion of second implication is a tautology
+
+    True
+
+  case 2:
+    x >= 0 ==> wp(y := x, 0 <= y && 0 <= x ==> y == x && x < 0 ==> y == -x)
+
+    Assignment
+    x >= 0 ==> (0 <= x && 0 <= x ==> x == x && x < 0 ==> x == -x)
+
+    x >= 0 ==> 0 <= x
+      Trivially true
+    x >= 0 ==> (0 <= x ==> x == x)
+      Second conclusion is a tautology
+    x >= 0 ==> (x < 0 ==> x == -x)
+      Second premise becomes false so first implication becomes true
+
+    True
+
+  case 1 && case 2 == True
+
+
+-- 2 --
+
+  -- a --
+  S = if (x > y) then (big, small := x, y) else (big, small := y, x)
+
+  wp(S; big > small)
+
+  Conditional
+  x >  y ==> wp((big, small := x, y), big > small) &&
+  x <= y ==> wp((big, small := y, x), big > small)
+
+  case 1;
+    x > y ==> wp((big, small := x, y), big > small)
+
+    Assignment
+    x > y ==> x > y
+
+    Trivially true
+
+  case 2:
+    x <= y ==> wp((big, small := y, x), big > small)
+
+    Assignment
+    x <= y ==> y > x
+
+    Cannot be proven. Becomes false if x == y.
+
+  --b--
+  Adding a precondition, requires x != y, solves this.
+
+  x != y ==> case 1 && case 2 =
+  x != y ==> (x > y ==> x > y) && (x <= y ==> y > x)
+
+  Case 1 is still trivial but now we can prove case 2.
+
+  x != y ==> (x <= y ==> y > x)
+
+  Since x can no longer be equal to y this holds as well.
+    
+
+
+
+
+
