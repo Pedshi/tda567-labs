@@ -90,8 +90,9 @@
   S1 = res := 0; if (n0 >= 0) then (n,m := n0, m0) else (n,m := -n0, -m0;)
   S  = res := res + m; n := n - 1
 
-  Invariant I = ?
-  Variant   V = ?
+  Invariant I = n0 >= 0 ==> (res == m * ( n0 - n) && m ==  m0) &&
+                n0 <  0 ==> (res == m * (-n0 - n) && m == -m0) &&
+                n >= 0;
 
   wp(S1, while (0 < n) S)
 
@@ -107,10 +108,17 @@
 
     Conditional:
     wp(res := 0,
-      (n0 >= 0) ==> wp((n,m :=  n0,  m0) , I)) &&
-      (n0 <  0) ==> wp((n,m := -n0, -m0;), I))
+      (n0 >= 0) ==> wp((n,m :=  n0,  m0), I) &&
+      (n0 <  0) ==> wp((n,m := -n0, -m0), I)
 
     Assignment:
+      (n0 >= 0) ==> (n0 >= 0 ==> (res == m0 * ( n0 - n0) && m0 ==  m0) &&
+                     n0 <  0 ==> (res == m0 * (-n0 - n0) && m0 == -m0) &&
+                     n0 >= 0)
+        &&
+      (n0 <  0) ==> (n0 >= 0 ==> (res == -m0 * ( n0 - n) && m ==  m0) &&
+                     n0 <  0 ==> (res == m * (-n0 - n) && m == -m0) &&
+                     n >= 0)
 
 
 
@@ -124,7 +132,6 @@
     (I && 0 < n) ==> wp(res := res + m, wp(n := n - 1, I))
 
     Assignment:
-
 
 
   3. Postcondition holds after loop:
