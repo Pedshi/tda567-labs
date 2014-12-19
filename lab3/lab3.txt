@@ -1,0 +1,246 @@
+-- 1 --
+
+  S = if (x < 0) then (y := -x) else (y := x)
+
+  wp(S, 0 <= y && 0 <= x ==> y == x && x < 0 ==> y == -x)
+
+  Conditional
+  x < 0 ==> wp(y := -x, 0 <= y && 0 <= x ==> y == x && x < 0 ==> y == -x) &&
+  x >= 0 ==> wp(y := x, 0 <= y && 0 <= x ==> y == x && x < 0 ==> y == -x)
+
+  case 1:
+    x < 0 ==> wp(y := -x, 0 <= y && 0 <= x ==> y == x && x < 0 ==> y == -x)
+
+    Assignment
+    x < 0 ==> (0 <= -x && 0 <= x ==> -x == x && x < 0 ==> -x == -x)
+
+    x < 0 ==> 0 <= -x
+      Trivially true
+    x < 0 ==> (0 <= x ==> -x == x)
+      Second premise becomes false following from the first
+    x < 0 ==> (x < 0 ==> -x == -x)
+      Conclusion of second implication is a tautology
+
+    True
+
+  case 2:
+    x >= 0 ==> wp(y := x, 0 <= y && 0 <= x ==> y == x && x < 0 ==> y == -x)
+
+    Assignment
+    x >= 0 ==> (0 <= x && 0 <= x ==> x == x && x < 0 ==> x == -x)
+
+    x >= 0 ==> 0 <= x
+      Trivially true
+    x >= 0 ==> (0 <= x ==> x == x)
+      Second conclusion is a tautology
+    x >= 0 ==> (x < 0 ==> x == -x)
+      Second premise becomes false so first implication becomes true
+
+    True
+
+  case 1 && case 2 == True
+
+
+-- 2 --
+
+  -- a --
+  S = if (x > y) then (big, small := x, y) else (big, small := y, x)
+
+  wp(S; big > small)
+
+  Conditional
+  x >  y ==> wp((big, small := x, y), big > small) &&
+  x <= y ==> wp((big, small := y, x), big > small)
+
+  case 1;
+    x > y ==> wp((big, small := x, y), big > small)
+
+    Assignment
+    x > y ==> x > y
+
+    Trivially true
+
+  case 2:
+    x <= y ==> wp((big, small := y, x), big > small)
+
+    Assignment
+    x <= y ==> y > x
+
+    Cannot be proven. Becomes false if x == y.
+
+  --b--
+  Adding a precondition, requires x != y, solves this.
+
+  x != y ==> case 1 && case 2 =
+  x != y ==> (x > y ==> x > y) && (x <= y ==> y > x)
+
+  Case 1 is still trivial but now we can prove case 2.
+
+  x != y ==> (x <= y ==> y > x)
+
+  Since x can no longer be equal to y this holds as well.
+
+-- 3 --
+
+  --a--
+  See enclosed file.
+
+  --b--
+
+  S1 = res := 0; if (n0 >= 0) then (n,m := n0, m0) else (n,m := -n0, -m0;)
+  S  = res := res + m; n := n - 1
+
+  Invariant I = n0 >= 0 ==> (res == m * ( n0 - n) && m ==  m0) &&
+                n0 <  0 ==> (res == m * (-n0 - n) && m == -m0) &&
+                n >= 0;
+
+  wp(S1, while (0 < n) S)
+
+  We now need five caes for proving the entire while-loop.
+
+  1. I needs to hold when entering the loop:
+
+    wp(S1, I) =
+    wp(res := 0; if (n0 >= 0) then (n,m := n0, m0) else (n,m := -n0, -m0;), I)
+
+    Sequential:
+    wp(res := 0, wp(if (n0 >= 0) then (n,m := n0, m0) else (n,m := -n0, -m0;), I))
+
+    Conditional:
+    wp(res := 0,
+      (n0 >= 0) ==> wp((n,m :=  n0,  m0), I) &&
+      (n0 <  0) ==> wp((n,m := -n0, -m0), I)
+
+    Assignment:
+    wp(res := 0,
+      (n0 >= 0) ==> (n0 >= 0 ==> (res == m0 * ( n0 - n0) && m0 ==  m0) &&
+                     n0 <  0 ==> (res == m0 * (-n0 - n0) && m0 == -m0) &&
+                     n0 >= 0)
+        &&
+      (n0 <  0) ==> (n0 >= 0 ==> (res == -m0 * ( n0 + n0) && -m0 ==  m0) &&
+                     n0 <  0 ==> (res == -m0 * (-n0 + n0) && -m0 == -m0) &&
+                     -n0 >= 0))
+
+    Assignment:
+      (n0 >= 0) ==> (n0 >= 0 ==> (0 == m0 * ( n0 - n0) && m0 ==  m0) &&
+                     n0 <  0 ==> (0 == m0 * (-n0 - n0) && m0 == -m0) &&
+                     n0 >= 0)
+        &&
+      (n0 <  0) ==> (n0 >= 0 ==> (0 == -m0 * ( n0 + n0) && -m0 ==  m0) &&
+                     n0 <  0 ==> (0 == -m0 * (-n0 + n0) && -m0 == -m0) &&
+                     -n0 >= 0)
+
+      =
+
+
+      (n0 >= 0) ==> (n0 >= 0 ==> (0 == 0 && m0 ==  m0) &&
+                     n0 <  0 ==> (0 == m0 * (-2*n0) && m0 == -m0) &&
+                     n0 >= 0)
+        &&
+      (n0 <  0) ==> (n0 >= 0 ==> (0 == -m0 * 2*n0 && -m0 ==  m0) &&
+                     n0 <  0 ==> (0 == 0 && -m0 == -m0) &&
+                     -n0 >= 0)
+
+      True (inner implications true when their premises are false).
+
+
+
+
+  2. Invariant holds each iteration:
+
+    (I && 0 < n) ==> wp(S, I) =
+    (I && 0 < n) ==> wp(res := res + m; n := n - 1, I)
+
+    Sequential:
+    (I && 0 < n) ==> wp(res := res + m, wp(n := n - 1, I))
+
+    Assignment:
+    (I && 0 < n) ==> wp(res := res + m,
+        n0 >= 0 ==> (res == m * ( n0 - (n - 1)) && m ==  m0) &&
+        n0 <  0 ==> (res == m * (-n0 - (n - 1)) && m == -m0) &&
+        n - 1 >= 0)
+
+    Assignment:
+    (I && 0 < n) ==>
+        n0 >= 0 ==> (res + m == m * ( n0 - (n - 1)) && m ==  m0) &&
+        n0 <  0 ==> (res + m == m * (-n0 - (n - 1)) && m == -m0) &&
+        n - 1 >= 0)
+
+    =
+
+    (I && 0 < n) ==>
+        n0 >= 0 ==> (res == m * ( n0 - n) && m ==  m0) &&
+        n0 <  0 ==> (res == m * (-n0 - n) && m == -m0) &&
+        n - 1 >= 0)
+
+    The first two expressions in the conjunction follows from the invariant,
+    and the third one can be derived from 0 < n.
+
+
+
+  3. Postcondition holds after loop:
+
+    (I && 0 >= n) ==> (res == n0 * m0)
+
+    =
+
+    ((n0 >= 0 ==> (res == m * ( n0 - n) && m ==  m0)) &&
+     (n0 <  0 ==> (res == m * (-n0 - n) && m == -m0)) &&
+     n >= 0 &&
+     0 >= n)
+        ==> (res = n0 * m0)
+
+    Case 1
+    (n0 >= 0 ==> (res == m * ( n0 - n) && m ==  m0)) &&
+    n >= 0 &&
+    0 >= n)
+      ==> (res = n0 * m0)
+
+    =
+
+    (n0 >= 0 ==> (res == m0 * n0))) ==> (res = n0 * m0)
+
+    Case 2
+    ((n0 <  0 ==> (res == m * (-n0 - n) && m == -m0)) &&
+     n >= 0 &&
+     0 >= n)
+        ==> (res = n0 * m0)
+
+    =
+
+    (n0 < 0 ==> (res == -m0 * -n0)) ==> (res = n0 * m0)
+
+    Both cases are trivially true.
+
+
+
+  4. Variant is bounded until loop termination:
+
+    (I && 0 < n) ==> n > 0
+
+    Trivially true
+
+
+  5. Variant decreases each iteration:
+
+    (I && 0 < n) ==> wp(V1 := n; S, n < V1) =
+    (I && 0 < n) ==> wp(V1 := n; res := res + m; n := n - 1, n < V1)
+
+    Sequential:
+    (I && 0 < n) ==> wp(V1 := n, wp(res := res + m; n := n - 1, n < V1))
+
+    Sequential:
+    (I && 0 < n) ==> wp(V1 := n, wp(res := res + m, wp(n := n - 1, n < V1)))
+
+    Assignment:
+    (I && 0 < n) ==> wp(V1 := n, wp(res := res + m, n - 1 < V1))
+
+    Assignment:
+    (I && 0 < n) ==> wp(V1 := n, n - 1 < V1)
+
+    Assignment:
+    (I && 0 < n) ==> n - 1 < n
+
+    Conclusion is trivially true so the implication holds
+
+
