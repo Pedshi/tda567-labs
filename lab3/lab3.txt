@@ -87,6 +87,9 @@
 
   --b--
 
+  We think we've managed to prove it, but dafny does not seem to agree with us.
+  We would love to get some feedback as to what has gone wrong :)
+
   S1 = res := 0; if (n0 >= 0) then (n,m := n0, m0) else (n,m := -n0, -m0;)
   S  = res := res + m; n := n - 1
 
@@ -104,14 +107,17 @@
     wp(res := 0; if (n0 >= 0) then (n,m := n0, m0) else (n,m := -n0, -m0;), I)
 
     Sequential:
+    -----------
     wp(res := 0, wp(if (n0 >= 0) then (n,m := n0, m0) else (n,m := -n0, -m0;), I))
 
     Conditional:
+    ------------
     wp(res := 0,
       (n0 >= 0) ==> wp((n,m :=  n0,  m0), I) &&
       (n0 <  0) ==> wp((n,m := -n0, -m0), I)
 
-    Assignment:
+    Assignment (n,m := n0, m0 and n,m := -n0, -m0):
+    -----------------------------------------------
     wp(res := 0,
       (n0 >= 0) ==> (n0 >= 0 ==> (res == m0 * ( n0 - n0) && m0 ==  m0) &&
                      n0 <  0 ==> (res == m0 * (-n0 - n0) && m0 == -m0) &&
@@ -121,7 +127,8 @@
                      n0 <  0 ==> (res == -m0 * (-n0 + n0) && -m0 == -m0) &&
                      -n0 >= 0))
 
-    Assignment:
+    Assignment (res := 0):
+    ----------------------
       (n0 >= 0) ==> (n0 >= 0 ==> (0 == m0 * ( n0 - n0) && m0 ==  m0) &&
                      n0 <  0 ==> (0 == m0 * (-n0 - n0) && m0 == -m0) &&
                      n0 >= 0)
@@ -131,7 +138,6 @@
                      -n0 >= 0)
 
       =
-
 
       (n0 >= 0) ==> (n0 >= 0 ==> (0 == 0 && m0 ==  m0) &&
                      n0 <  0 ==> (0 == m0 * (-2*n0) && m0 == -m0) &&
@@ -144,23 +150,25 @@
       True (inner implications true when their premises are false).
 
 
-
-
   2. Invariant holds each iteration:
 
-    (I && 0 < n) ==> wp(S, I) =
+    (I && 0 < n) ==> wp(S, I)
+    =
     (I && 0 < n) ==> wp(res := res + m; n := n - 1, I)
 
     Sequential:
+    -----------
     (I && 0 < n) ==> wp(res := res + m, wp(n := n - 1, I))
 
-    Assignment:
+    Assignment (n := n - 1):
+    ------------------------
     (I && 0 < n) ==> wp(res := res + m,
         n0 >= 0 ==> (res == m * ( n0 - (n - 1)) && m ==  m0) &&
         n0 <  0 ==> (res == m * (-n0 - (n - 1)) && m == -m0) &&
         n - 1 >= 0)
 
-    Assignment:
+    Assignment (res := res + m):
+    ----------------------------
     (I && 0 < n) ==>
         n0 >= 0 ==> (res + m == m * ( n0 - (n - 1)) && m ==  m0) &&
         n0 <  0 ==> (res + m == m * (-n0 - (n - 1)) && m == -m0) &&
@@ -184,26 +192,33 @@
 
     =
 
-    ((n0 >= 0 ==> (res == m * ( n0 - n) && m ==  m0)) &&
-     (n0 <  0 ==> (res == m * (-n0 - n) && m == -m0)) &&
+    (n0 >= 0 ==> (res == m * ( n0 - n) && m ==  m0)) &&
+    (n0 <  0 ==> (res == m * (-n0 - n) && m == -m0)) &&
      n >= 0 &&
-     0 >= n)
+     0 >= n
         ==> (res = n0 * m0)
 
-    Case 1
+    =
+
     (n0 >= 0 ==> (res == m * ( n0 - n) && m ==  m0)) &&
-    n >= 0 &&
-    0 >= n)
-      ==> (res = n0 * m0)
+    (n0 <  0 ==> (res == m * (-n0 - n) && m == -m0)) &&
+     n == 0
+        ==> (res = n0 * m0)
+
+    Case 1 (n0 >= 0)
+    ----------------
+    (n0 >= 0 ==> (res == m * ( n0 - n) && m ==  m0)) &&
+     n == 0
+        ==> (res = n0 * m0)
 
     =
 
     (n0 >= 0 ==> (res == m0 * n0))) ==> (res = n0 * m0)
 
-    Case 2
-    ((n0 <  0 ==> (res == m * (-n0 - n) && m == -m0)) &&
-     n >= 0 &&
-     0 >= n)
+    Case 2 (n0 < 0)
+    ---------------
+    (n0 < 0 ==> (res == m * (-n0 - n) && m == -m0)) &&
+     n == 0
         ==> (res = n0 * m0)
 
     =
@@ -223,24 +238,151 @@
 
   5. Variant decreases each iteration:
 
-    (I && 0 < n) ==> wp(V1 := n; S, n < V1) =
+    (I && 0 < n) ==> wp(V1 := n; S, n < V1)
+    =
     (I && 0 < n) ==> wp(V1 := n; res := res + m; n := n - 1, n < V1)
 
     Sequential:
+    -----------
     (I && 0 < n) ==> wp(V1 := n, wp(res := res + m; n := n - 1, n < V1))
 
     Sequential:
+    -----------
     (I && 0 < n) ==> wp(V1 := n, wp(res := res + m, wp(n := n - 1, n < V1)))
 
     Assignment:
+    -----------
     (I && 0 < n) ==> wp(V1 := n, wp(res := res + m, n - 1 < V1))
 
     Assignment:
+    -----------
     (I && 0 < n) ==> wp(V1 := n, n - 1 < V1)
 
     Assignment:
+    -----------
     (I && 0 < n) ==> n - 1 < n
 
     Conclusion is trivially true so the implication holds
 
+
+
+-- 4 --
+
+  --a--
+  See enclosed file.
+
+  --b--
+  Since we're only supposed to prove correctness of the loop, we assume fact
+  is correctly implemented according to the mathematical factorial definition
+  (which we've also proven with dafny).
+
+  Pre  = n > 0
+  Post = res == fact(n)
+  I    = res == fact(i-1) && i <= n + 1;
+  S1   = res := 1; i := 2;
+  S    = res := res * i; i := i + 1;
+  B    = i <= n
+  V    = n - i + 1
+
+  1. I needs to hold when entering the loop:
+    Pre ==> wp(S1, I)
+    =
+    n > 0 ==> wp(res := 1; i := 2, res == fact(i-1) && i <= n + 1)
+
+    Sequential:
+    -----------
+    n > 0 ==> wp(res := 1, wp(i := 2, res == fact(i-1) && i <= n + 1))
+
+    Assignment (i := 2):
+    --------------------
+    n > 0 ==> wp(res := 1, res == fact(1) && 2 <= n + 1)
+
+    Assignment (res := 1):
+    ----------------------
+    n > 0 ==> 1 == fact(1) && 2 <= n + 1
+
+    True (fact(1) = 1 and 2 <= n + 1 when n > 0)
+
+
+  
+  2. Invariant holds each iteration:
+    I && B ==> wp(S, I)
+    =
+    res == fact(i-1) && i <= n + 1 && i <= n ==>
+      wp(res := res * i; i := i + 1, res == fact(i-1) && i <= n + 1)
+
+    Sequential:
+    -----------
+    res == fact(i-1) && i <= n + 1 && i <= n ==>
+      wp(res := res * i, wp(i := i + 1, res == fact(i-1) && i <= n + 1))
+
+    Assignment (i := i + 1):
+    -----------------------
+    res == fact(i-1) && i <= n + 1 && i <= n ==>
+      wp(res := res * i, res == fact(i) && i <= n)
+
+    Assignment (res := res * i):
+    ----------------------------
+    res == fact(i-1) && i <= n + 1 && i <= n ==>
+      res * i == fact(i) && i <= n
+
+
+    True - definition of factorial tells us that (i-1)! * i == i!.
+
+
+
+  3. Postcondition holds after loop:
+    I && !B ==> Post
+    =
+    res == fact(i-1) && i <= n + 1 && i > n ==> res == fact(n)
+    =
+    res == fact(i-1) && i == n + 1 ==> res == fact(n)
+    =
+    res == fact(n) ==> res == fact(n)
+
+    True - duh!
+
+
+
+  4. Variant is bounded until loop termination:
+    I && B ==> V > 0
+    =
+    res == fact(i-1) && i <= n + 1 && i <= n ==> n - i + 1 > 0
+    
+    True (i <= n ==> n - i >= 0)
+
+
+
+  5. Variant decreases each iteration:
+    I && B ==> wp(V1 := V; S, V < V1)
+    =
+    res == fact(i-1) && i <= n + 1 && i <= n ==>
+      wp(V1 := n - i + 1; res := res * i; i := i + 1, n - i + 1 < V1)
+    
+    Sequential:
+    -----------
+    res == fact(i-1) && i <= n + 1 && i <= n ==>
+      wp(V1 := n - i + 1; res := res * i, wp(i := i + 1, n - i + 1 < V1))
+
+    Sequential:
+    -----------
+    res == fact(i-1) && i <= n + 1 && i <= n ==>
+      wp(V1 := n - i + 1, wp(res := res * i, wp(i := i + 1, n - i + 1 < V1)))
+
+    Assignment (i := i + 1):
+    ------------------------
+    res == fact(i-1) && i <= n + 1 && i <= n ==>
+      wp(V1 := n - i + 1, wp(res := res * i, n - i < V1))
+
+    Assignment (res := res * i):
+    ----------------------------
+    res == fact(i-1) && i <= n + 1 && i <= n ==>
+      wp(V1 := n - i + 1, n - i < V1)
+
+    Assignment (V1 := n - i + 1):
+    -----------------------------
+    res == fact(i-1) && i <= n + 1 && i <= n ==>
+      n - i < n - i + 1
+
+    Trivially true
 
